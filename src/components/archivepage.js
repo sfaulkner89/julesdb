@@ -32,7 +32,9 @@ export default function ArchivePage(props) {
         const searchWords = props.search.split(" ");
         let score = 0;
         for (let searchWord of searchWords) {
-          score += wordArray.filter((word) => word === searchWord).length;
+          score += wordArray.filter(
+            (word) => word.toLowerCase() === searchWord.toLowerCase()
+          ).length;
         }
         sortedArray.push({
           score: score,
