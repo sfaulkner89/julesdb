@@ -28,7 +28,10 @@ export default function EntryElement({
   return popOut ? (
     <FullscreenImage source={popOut} exitFullscreen={() => setPopOut()} />
   ) : url.length ? (
-    <div className="entryContainer">
+    <div
+      className="entryContainer"
+      style={{ border: `2px solid ${dark ? lightColor : darkColor}` }}
+    >
       <div className="imagesContainer">
         {url.map((image, i) => {
           return (

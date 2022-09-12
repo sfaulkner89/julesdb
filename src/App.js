@@ -16,7 +16,7 @@ function App() {
   const [size, setSize] = useState(userSize);
   const [dark, setDark] = useState(darkMode);
   const [status, setStatus] = useState("Starting Up...");
-  const [searchOps, setSearchOps] = useState(["Designer"]);
+  const [searchOps, setSearchOps] = useState([]);
   const [search, setSearch] = useState("");
 
   const pagebody = [

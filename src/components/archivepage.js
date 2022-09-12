@@ -57,7 +57,7 @@ export default function ArchivePage(props) {
   };
 
   return (
-    <div>
+    <div className="libHolder">
       {sortedData[0]?.score > 0
         ? sortedData.map((entry) => {
             return (

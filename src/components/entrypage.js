@@ -7,7 +7,6 @@ import LoadingScreen from "./LoadingScreen.js";
 import { v4 as uuidv4 } from "uuid";
 import heic2any from "heic2any";
 import { TextField, Button, IconButton } from "@mui/material";
-import { PhotoCamera } from "@mui/icons-material";
 import imageCompression from "browser-image-compression";
 import { status } from "../assets/statuses";
 
@@ -30,7 +29,7 @@ export default function EntryPage(props) {
   const [loadingStatus, setLoadingStatus] = useState("Starting up...");
 
   async function changeHandler(e, type, name) {
-    console.log(data);
+    console.log(e.target.files);
     if (type === "text") setData({ ...data, [name]: e.target.value });
     if (type === "file") setFiles(e.target.files);
   }
@@ -129,11 +128,21 @@ export default function EntryPage(props) {
           component="label"
         >
           <input hidden accept="image/*" type="file" />
-          <PhotoCamera />
         </IconButton>{" "}
         <p style={{ color: props.dark ? props.lightColor : props.darkColor }}>
           {files.length} files selected
         </p>
+        {files.length
+          ? Array.from(files).map((photog) => {
+              console.log(photog);
+              return (
+                <img
+                  className="previewimg"
+                  src={URL.createObjectURL(photog)}
+                ></img>
+              );
+            })
+          : ""}
       </div>
       <div className="submitHolder">
         <Button onClick={submitHandler}>Submit</Button>
