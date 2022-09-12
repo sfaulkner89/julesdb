@@ -15,25 +15,34 @@ export default function ArchivePage(props) {
   }, [props.search, props.searchOps]);
 
   const sortData = () => {
+    let tempSearchOps = props.searchOps;
+    if (tempSearchOps.length === 0) {
+      tempSearchOps = ["Designer", "Year", "Country", "Notes", "Tags"];
+    }
     if (props.search.length !== 0) {
       let sortedArray = [];
       for (let entry of data) {
         let wordArray = [];
-        for (let op of props.searchOps) {
-          console.log(entry);
-          console.log(op);
+        for (let op of tempSearchOps) {
           let elementWords = entry[op].split(" ");
           console.log(elementWords);
-          wordArray.push(elementWords);
+          wordArray.push(...elementWords);
         }
-        console.log(String(props.search));
+        console.log(props.search.split(" "));
+        const searchWords = props.search.split(" ");
+        let score = 0;
+        for (let searchWord of searchWords) {
+          score += wordArray.filter((word) => word === searchWord).length;
+        }
         sortedArray.push({
-          score: wordArray.filter((word) => word === "1989").length,
+          score: score,
           entry: entry,
         });
       }
-      sortedArray.sort((a, b) => b.score - a.score);
-      console.log(sortedArray);
+      const matches = sortedArray.filter((entry) => entry.score !== 0);
+      const sortedMatches = matches.sort((a, b) => b.score - a.score);
+      setSortedData(sortedMatches);
+      console.log(sortedMatches);
     }
   };
   const loadData = async () => {
@@ -49,17 +58,29 @@ export default function ArchivePage(props) {
 
   return (
     <div>
-      {data.map((entry) => {
-        return (
-          <EntryElement
-            size={props.size}
-            entry={entry}
-            dark={props.dark}
-            darkColor={props.darkColor}
-            lightColor={props.lightColor}
-          />
-        );
-      })}
+      {sortedData[0]?.score > 0
+        ? sortedData.map((entry) => {
+            return (
+              <EntryElement
+                size={props.size}
+                entry={entry.entry}
+                dark={props.dark}
+                darkColor={props.darkColor}
+                lightColor={props.lightColor}
+              />
+            );
+          })
+        : data.map((entry) => {
+            return (
+              <EntryElement
+                size={props.size}
+                entry={entry}
+                dark={props.dark}
+                darkColor={props.darkColor}
+                lightColor={props.lightColor}
+              />
+            );
+          })}
     </div>
   );
 }

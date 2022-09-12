@@ -16,7 +16,16 @@ export default function Toolbar(props) {
 
   function pagehandler() {
     props.page();
-    setNewEntry(!newEntry);
+  }
+
+  function sizeHandler(value) {
+    window.localStorage.setItem("picSize", value);
+    props.setSize(value);
+  }
+
+  function darkHandler(value) {
+    window.localStorage.setItem("darkMode", value);
+    props.setDark(value);
   }
 
   const pressHandler = (e, selection) => {
@@ -38,9 +47,14 @@ export default function Toolbar(props) {
         >
           Dark Mode
         </p>
-        <Switch size="small" onChange={() => props.setDark()} color="success" />
+        <Switch
+          size="small"
+          onChange={(e) => darkHandler(e.target.checked)}
+          color="success"
+          checked={props.dark}
+        />
       </div>
-      {!newEntry ? (
+      {!props.newEntry ? (
         <div className="slideHolder">
           <p
             style={{
@@ -53,8 +67,9 @@ export default function Toolbar(props) {
             type="range"
             min={10}
             max={34}
-            onChange={(e) => props.size(e.target.value)}
+            onChange={(e) => sizeHandler(e.target.value)}
             style={{ background: "#2e7d32" }}
+            value={props.size}
           />
         </div>
       ) : (
@@ -69,11 +84,11 @@ export default function Toolbar(props) {
             }}
             onClick={() => pagehandler()}
           >
-            <p>{newEntry ? "Archive" : "New Entry"}</p>
+            <p>{props.newEntry ? "Archive" : "New Entry"}</p>
           </Button>
         </div>
       </div>
-      {newEntry ? (
+      {props.newEntry ? (
         <></>
       ) : (
         <div className="inputHolder">

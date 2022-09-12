@@ -1,12 +1,12 @@
-import React from 'react'
+import React from "react";
 
-export default function LoadingScreen ({
+export default function LoadingScreen({
   remaining,
   totalFiles,
   dark,
   darkColor,
   lightColor,
-  status
+  status,
 }) {
   return (
     <div>
@@ -15,7 +15,7 @@ export default function LoadingScreen ({
         {remaining}/{totalFiles}
       </h1>
       <h2>{status}</h2>
-      <div className='lds-hourglass' />
+      <div className="lds-hourglass" />
     </div>
-  )
+  );
 }
