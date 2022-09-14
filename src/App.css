@@ -10,6 +10,24 @@
   max-width: 100vw;
 }
 
+.removeButton, .checkButtonYes, .checkButtonNo {
+  position: absolute;
+  background-color: transparent;
+  border: none;
+  text-align: right;
+  right: 2%
+}
+
+.checkButtonYes {
+  margin-top: 1%;
+}
+
+.checkButtonNo {
+  margin-top: 3%;
+}
+
+
+
 .fullscreenImageHolder {
   display: absolute;
   top: 0;
@@ -96,6 +114,18 @@ align-items: center;
   border: 2px solid white;
 
 }
+
+.editButton {
+  background-color: transparent;
+  border: none;
+  text-align: right;
+  font-size: 10px;
+}
+
+.editButton:hover, .removeButton:hover, .checkButtonYes:hover, .checkButtonNo:hover {
+  font-weight: bold;
+}
+
 .imagesContainer {
   display: flex;
   max-width: 70%;

@@ -27,6 +27,7 @@ export default function EntryPage(props) {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(0);
   const [loadingStatus, setLoadingStatus] = useState("Starting up...");
+  const [noFiles, setNoFiles] = useState(false);
 
   async function changeHandler(e, type, name) {
     console.log(e.target.files);
@@ -39,54 +40,68 @@ export default function EntryPage(props) {
     console.log(files.length);
     const uuid = uuidv4();
     const imageArr = [];
-    try {
-      for (let file of files) {
-        console.log(file);
-        const extension = file.name.split(".")[1];
-        if (extension === "HEIC") {
-          setLoadingStatus(status.converting);
-          file = await heic2any({
-            blob: file,
-            toType: "image/png",
-            quality: 0.2,
-          });
+    if (files.length > 0) {
+      try {
+        for (let file of files) {
           console.log(file);
+          const extension = file.name.split(".")[1];
+          if (extension === "HEIC") {
+            setLoadingStatus(status.converting);
+            file = await heic2any({
+              blob: file,
+              toType: "image/png",
+              quality: 0.2,
+            });
+            console.log(file);
+          }
+          if (file && file.type.split("/")[0] !== "image") {
+            throw new Error("not an image");
+          }
+          if (file.size > 1_000_000) {
+            setLoadingStatus(status.compressing);
+            const compressedFile = await imageCompression(file, options);
+            console.log("After:", compressedFile.size / 1024 / 1024);
+            file = compressedFile;
+          }
+          const imgDic = {};
+          const fileuuid = uuidv4();
+          const imageRef = ref(storage, `jewellery/${uuid}/${fileuuid}`);
+          setLoadingStatus(status.uploading);
+          const uploadFile = await uploadBytes(imageRef, file).catch((err) =>
+            console.log(err)
+          );
+          console.log(uploadFile);
+          Object.assign(imgDic, {
+            ref: uploadFile.metadata.fullPath,
+            url: await getDownloadURL(
+              ref(storage, uploadFile.metadata.fullPath)
+            ),
+          });
+          imageArr.push(imgDic);
+          setLoading((loading) => loading - 1);
         }
-        if (file && file.type.split("/")[0] !== "image") {
-          throw new Error("not an image");
-        }
-        if (file.size > 1_000_000) {
-          setLoadingStatus(status.compressing);
-          const compressedFile = await imageCompression(file, options);
-          console.log("After:", compressedFile.size / 1024 / 1024);
-          file = compressedFile;
-        }
-        const imgDic = {};
-        const fileuuid = uuidv4();
-        const imageRef = ref(storage, `jewellery/${uuid}/${fileuuid}`);
-        setLoadingStatus(status.uploading);
-        const uploadFile = await uploadBytes(imageRef, file).catch((err) =>
-          console.log(err)
-        );
-        console.log(uploadFile);
-        Object.assign(imgDic, {
-          ref: uploadFile.metadata.fullPath,
-          url: await getDownloadURL(ref(storage, uploadFile.metadata.fullPath)),
-        });
-        imageArr.push(imgDic);
-        setLoading((loading) => loading - 1);
-      }
-      const dataToGo = { ...data, date: new Date(), id: uuid, image: imageArr };
-      const docRef = await addDoc(collection(db, "jewellery"), dataToGo);
-      console.log(dataToGo);
-      setData(emptyObj);
-      props.setNewEntry(false);
-    } catch (err) {
-      setLoadingStatus(status.error);
-      setTimeout(() => {
+        const dataToGo = {
+          ...data,
+          date: new Date(),
+          id: uuid,
+          image: imageArr,
+        };
+        const docRef = await addDoc(collection(db, "jewellery"), dataToGo);
+        console.log(dataToGo);
         setData(emptyObj);
         props.setNewEntry(false);
-      }, 4000);
+      } catch (err) {
+        setLoadingStatus(status.error);
+        setTimeout(() => {
+          setData(emptyObj);
+          props.setNewEntry(false);
+        }, 4000);
+      }
+    } else {
+      setNoFiles(true);
+      setTimeout(() => {
+        setNoFiles(false);
+      }, 3000);
     }
   }
   return loading > 0 ? (
@@ -146,6 +161,19 @@ export default function EntryPage(props) {
       </div>
       <div className="submitHolder">
         <Button onClick={submitHandler}>Submit</Button>
+        {noFiles ? (
+          <div
+            style={{
+              backgroundColor: "darkred",
+              padding: "0.001em 0.3em 0.001em 0.3em",
+              borderRadius: "10px",
+            }}
+          >
+            <p>You need to add a picture babes...</p>
+          </div>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );
